@@ -1,83 +1,35 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 
-int b[50000];
-
-void Merge(int a[], int low, int mid, int high)
+int main(int argc, char *argv[])
 {
-    int i, j, k;
+    FILE *f1, *f2;
+    char ch;
 
-    i = low;
-    j = mid + 1;
-    k = low;
-
-    while(i <= mid && j <= high)
+    if(argc != 3)
     {
-        if(a[i] <= a[j])
-            b[k++] = a[i++];
-        else
-            b[k++] = a[j++];
+        printf("Usage: ./a.out source destination\n");
+        return 1;
     }
 
-    while(i <= mid)
-        b[k++] = a[i++];
+    f1 = fopen(argv[1], "r");
 
-    while(j <= high)
-        b[k++] = a[j++];
-
-    for(k = low; k <= high; k++)
-        a[k] = b[k];
-}
-
-void MergeSort(int a[], int low, int high)
-{
-    int mid;
-
-    if(low >= high)
-        return;
-
-    mid = (low + high) / 2;
-
-    MergeSort(a, low, mid);
-    MergeSort(a, mid + 1, high);
-
-    Merge(a, low, mid, high);
-}
-
-int main()
-{
-    int n, a[50000], k;
-    clock_t st, et;
-    double ts;
-
-    printf("Enter How many Numbers: ");
-    scanf("%d", &n);
-
-    srand(time(0));
-
-    printf("The Random Numbers are:\n");
-
-    for(k = 0; k < n; k++)
+    if(f1 == NULL)
     {
-        a[k] = rand() % 1000;
-        printf("%d\t", a[k]);
+        printf("Cannot open source file\n");
+        return 1;
     }
 
-    st = clock();
+    f2 = fopen(argv[2], "w");
 
-    MergeSort(a, 0, n - 1);
+    while((ch = fgetc(f1)) != EOF)
+    {
+        fputc(ch, f2);
+    }
 
-    et = clock();
+    printf("File copied successfully\n");
 
-    ts = (double)(et - st) / CLOCKS_PER_SEC;
-
-    printf("\nSorted Numbers are:\n");
-
-    for(k = 0; k < n; k++)
-        printf("%d\t", a[k]);
-
-    printf("\nThe time taken is %e", ts);
+    fclose(f1);
+    fclose(f2);
 
     return 0;
 }

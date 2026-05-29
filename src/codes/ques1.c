@@ -1,74 +1,86 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
-void Exch(int *p, int *q)
+void performOperation(char op, int a, int b)
 {
-    int temp = *p;
-    *p = *q;
-    *q = temp;
-}
+    int result;
 
-void QuickSort(int a[], int low, int high)
-{
-    int i, j, pivot;
-
-    if(low >= high)
-        return;
-
-    pivot = a[low];
-    i = low + 1;
-    j = high;
-
-    while(i <= j)
+    switch(op)
     {
-        while(i <= high && a[i] <= pivot)
-            i++;
+        case '+':
+            result = a + b;
+            break;
 
-        while(a[j] > pivot)
-            j--;
+        case '-':
+            result = a - b;
+            break;
 
-        if(i < j)
-            Exch(&a[i], &a[j]);
+        case '*':
+            result = a * b;
+            break;
+
+        case '/':
+            if(b == 0)
+            {
+                printf("Division by zero not possible\n");
+                exit(1);
+            }
+
+            result = a / b;
+            break;
+
+        default:
+            printf("Invalid Operator\n");
+            exit(1);
     }
 
-    Exch(&a[low], &a[j]);
+    printf("Result = %d\n", result);
 
-    QuickSort(a, low, j - 1);
-    QuickSort(a, j + 1, high);
+    exit(result);
 }
 
 int main()
 {
-    int n, a[1000], k;
-    clock_t st, et;
-    double ts;
+    char op;
+    int a, b, status;
 
-    printf("Enter How many Numbers: ");
-    scanf("%d", &n);
+    printf("Enter operator (+,-,*,/): ");
+    scanf(" %c", &op);
 
-    printf("The Random Numbers are:\n");
+    printf("Enter first number: ");
+    scanf("%d", &a);
 
-    for(k = 0; k < n; k++)
+    printf("Enter second number: ");
+    scanf("%d", &b);
+
+    pid_t pid = fork();
+
+    if(pid < 0)
     {
-        a[k] = rand() % 1000;
-        printf("%d\t", a[k]);
+        printf("Fork Failed\n");
     }
 
-    st = clock();
+    else if(pid == 0)
+    {
+        // Child Process
 
-    QuickSort(a, 0, n - 1);
+        performOperation(op, a, b);
+    }
 
-    et = clock();
+    else
+    {
+        // Parent Process
 
-    ts = (double)(et - st) / CLOCKS_PER_SEC;
+        waitpid(pid, &status, 0);
 
-    printf("\nSorted Numbers are:\n");
-
-    for(k = 0; k < n; k++)
-        printf("%d\t", a[k]);
-
-    printf("\nThe time taken is %e", ts);
+        if(WIFEXITED(status))
+        {
+            printf("Child exited with result %d\n",
+            WEXITSTATUS(status));
+        }
+    }
 
     return 0;
 }

@@ -1,40 +1,67 @@
-/* ques7.c - Longest Common Subsequence */
-
-#include<stdio.h>
-#include<string.h>
-
-int maxVal(int a, int b)
-{
-    if(a > b)
-        return a;
-    else
-        return b;
-}
-
-int lcs(char X[], char Y[], int m, int n)
-{
-    if(m == 0 || n == 0)
-        return 0;
-
-    if(X[m - 1] == Y[n - 1])
-        return 1 + lcs(X, Y, m - 1, n - 1);
-
-    return maxVal(
-        lcs(X, Y, m, n - 1),
-        lcs(X, Y, m - 1, n)
-    );
-}
+#include <stdio.h>
 
 int main()
 {
-    char X[] = "abcbdab";
-    char Y[] = "bdcaba";
+    int b[25], f[25];
 
-    int m = strlen(X);
-    int n = strlen(Y);
+    int bf[25] = {0};
 
-    printf("Length of LCS is = %d\n",
-           lcs(X, Y, m, n));
+    int ff[25];
+
+    int frag[25];
+
+    int nb, nf;
+
+    printf("Enter number of blocks: ");
+
+    scanf("%d", &nb);
+
+    printf("Enter number of files: ");
+
+    scanf("%d", &nf);
+
+    printf("Enter block sizes:\n");
+
+    for(int i = 0; i < nb; i++)
+    {
+        scanf("%d", &b[i]);
+    }
+
+    printf("Enter file sizes:\n");
+
+    for(int i = 0; i < nf; i++)
+    {
+        scanf("%d", &f[i]);
+    }
+
+    for(int i = 0; i < nf; i++)
+    {
+        for(int j = 0; j < nb; j++)
+        {
+            if(bf[j] == 0 && b[j] >= f[i])
+            {
+                ff[i] = j;
+
+                frag[i] = b[j] - f[i];
+
+                bf[j] = 1;
+
+                break;
+            }
+        }
+    }
+
+    printf("\nFile\tFileSize\tBlock\tBlockSize\tFragment\n");
+
+    for(int i = 0; i < nf; i++)
+    {
+        printf("%d\t%d\t\t%d\t%d\t\t%d\n",
+        i+1,
+        f[i],
+        ff[i]+1,
+        b[ff[i]],
+        frag[i]);
+    }
 
     return 0;
 }
