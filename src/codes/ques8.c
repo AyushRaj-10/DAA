@@ -1,108 +1,62 @@
-#include <stdio.h>
+/* ques8.c - Prim's Algorithm */
 
-int frame[3];
+#include<stdio.h>
 
-void display()
-{
-    printf("\n");
-
-    for(int i = 0; i < 3; i++)
-    {
-        printf("%d ", frame[i]);
-    }
-}
+int a, b, u, v, n, i, j, ne = 1;
+int visited[10] = {0}, min, mincost = 0;
+int cost[10][10];
 
 int main()
 {
-    int pages[12] =
-    {2,3,2,1,5,2,4,5,3,2,5,2};
+    printf("Enter number of nodes: ");
+    scanf("%d", &n);
 
-    int fs[3];
+    printf("Enter adjacency matrix:\n");
 
-    int pf = 0;
-
-    for(int i = 0; i < 3; i++)
+    for(i = 1; i <= n; i++)
     {
-        frame[i] = -1;
+        for(j = 1; j <= n; j++)
+        {
+            scanf("%d", &cost[i][j]);
+
+            if(cost[i][j] == 0)
+                cost[i][j] = 999;
+        }
     }
 
-    for(int j = 0; j < 12; j++)
+    visited[1] = 1;
+
+    while(ne < n)
     {
-        int flag1 = 0;
-        int flag2 = 0;
-
-        // Page Hit
-
-        for(int i = 0; i < 3; i++)
+        for(i = 1, min = 999; i <= n; i++)
         {
-            if(frame[i] == pages[j])
+            for(j = 1; j <= n; j++)
             {
-                flag1 = 1;
-                flag2 = 1;
-
-                break;
-            }
-        }
-
-        // Empty Frame
-
-        if(flag1 == 0)
-        {
-            for(int i = 0; i < 3; i++)
-            {
-                if(frame[i] == -1)
+                if(cost[i][j] < min)
                 {
-                    frame[i] = pages[j];
-
-                    flag2 = 1;
-
-                    break;
-                }
-            }
-        }
-
-        // Replace LRU Page
-
-        if(flag2 == 0)
-        {
-            for(int i = 0; i < 3; i++)
-            {
-                fs[i] = 0;
-            }
-
-            int index;
-
-            for(int k = j-1, l = 1;
-                l <= 2;
-                l++, k--)
-            {
-                for(int i = 0; i < 3; i++)
-                {
-                    if(frame[i] == pages[k])
+                    if(visited[i] != 0)
                     {
-                        fs[i] = 1;
+                        min = cost[i][j];
+                        a = u = i;
+                        b = v = j;
                     }
                 }
             }
-
-            for(int i = 0; i < 3; i++)
-            {
-                if(fs[i] == 0)
-                {
-                    index = i;
-                }
-            }
-
-            frame[index] = pages[j];
-
-            pf++;
         }
 
-        display();
+        if(visited[u] == 0 || visited[v] == 0)
+        {
+            printf("\nEdge %d: (%d %d) cost: %d",
+                   ne++, a, b, min);
+
+            mincost += min;
+            visited[b] = 1;
+        }
+
+        cost[a][b] = cost[b][a] = 999;
     }
 
-    printf("\nPage Faults = %d",
-    pf + 3);
+    printf("\nMinimum cost = %d", mincost);
 
     return 0;
 }
