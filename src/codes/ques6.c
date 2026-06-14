@@ -1,88 +1,47 @@
-#include <stdio.h>
+/* ques6.c - Matrix Chain Multiplication */
 
-int main()
+#include<stdio.h>
+#include<limits.h>
+
+int MatrixChainOrder(int p[], int n)
 {
-    int n = 5;
-    int m = 3;
+    int m[n][n];
+    int i, j, k, L, q;
 
-    int alloc[5][3] = {
-        {0,1,0},
-        {2,0,0},
-        {3,0,2},
-        {2,1,1},
-        {0,0,2}
-    };
+    for(i = 1; i < n; i++)
+        m[i][i] = 0;
 
-    int max[5][3] = {
-        {7,5,3},
-        {3,2,2},
-        {9,0,2},
-        {2,2,2},
-        {4,3,3}
-    };
-
-    int avail[3] = {3,3,2};
-
-    int need[5][3];
-
-    int finish[5] = {0};
-
-    int safe[5];
-
-    int index = 0;
-
-    // Calculate Need Matrix
-
-    for(int i = 0; i < n; i++)
+    for(L = 2; L < n; L++)
     {
-        for(int j = 0; j < m; j++)
+        for(i = 1; i <= n - L + 1; i++)
         {
-            need[i][j] =
-            max[i][j] - alloc[i][j];
-        }
-    }
+            j = i + L - 1;
 
-    // Find Safe Sequence
+            m[i][j] = INT_MAX;
 
-    for(int k = 0; k < n; k++)
-    {
-        for(int i = 0; i < n; i++)
-        {
-            if(finish[i] == 0)
+            for(k = i; k <= j - 1; k++)
             {
-                int possible = 1;
+                q = m[i][k]
+                  + m[k + 1][j]
+                  + p[i - 1] * p[k] * p[j];
 
-                for(int j = 0; j < m; j++)
-                {
-                    if(need[i][j] > avail[j])
-                    {
-                        possible = 0;
-
-                        break;
-                    }
-                }
-
-                if(possible)
-                {
-                    safe[index++] = i;
-
-                    finish[i] = 1;
-
-                    for(int j = 0; j < m; j++)
-                    {
-                        avail[j] += alloc[i][j];
-                    }
-                }
+                if(q < m[i][j])
+                    m[i][j] = q;
             }
         }
     }
 
-    printf("Safe Sequence:\n");
+    return m[1][n - 1];
+}
 
-    for(int i = 0; i < n; i++)
-    {
-        printf("P%d ", safe[i]);
-    }
+int main()
+{
+    int arr[] = {30, 35, 15, 5, 10, 20, 25};
+
+    int size = sizeof(arr) / sizeof(arr[0]);
+
+    printf("Minimum number of multiplications is %d\n",
+           MatrixChainOrder(arr, size));
 
     return 0;
 }

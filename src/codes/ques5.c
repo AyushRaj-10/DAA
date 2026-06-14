@@ -1,102 +1,53 @@
-#include <stdio.h>
-#include <stdlib.h>
+/* ques5.c - Horspool String Matching */
 
-int mutex = 1;
-int full = 0;
-int empty = 3;
-int x = 0;
-
-int wait(int s)
-{
-    return --s;
-}
-
-int signal(int s)
-{
-    return ++s;
-}
-
-void producer()
-{
-    mutex = wait(mutex);
-
-    full = signal(full);
-
-    empty = wait(empty);
-
-    x++;
-
-    printf("Producer produces item %d\n", x);
-
-    mutex = signal(mutex);
-}
-
-void consumer()
-{
-    mutex = wait(mutex);
-
-    full = wait(full);
-
-    empty = signal(empty);
-
-    printf("Consumer consumes item %d\n", x);
-
-    x--;
-
-    mutex = signal(mutex);
-}
+#include<stdio.h>
+#include<string.h>
 
 int main()
 {
-    int choice;
+    int table[126];
+    char t[100], p[25];
 
-    while(1)
+    int n, i, k, j, m, flag = 0;
+
+    printf("Enter text: ");
+    scanf("%s", t);
+
+    printf("Enter pattern: ");
+    scanf("%s", p);
+
+    n = strlen(t);
+    m = strlen(p);
+
+    for(i = 0; i < 126; i++)
+        table[i] = m;
+
+    for(j = 0; j < m - 1; j++)
+        table[p[j]] = m - 1 - j;
+
+    i = m - 1;
+
+    while(i <= n - 1)
     {
-        printf("\n1. Producer");
-        printf("\n2. Consumer");
-        printf("\n3. Exit");
+        k = 0;
 
-        printf("\nEnter choice: ");
+        while(k <= m - 1 && p[m - 1 - k] == t[i - k])
+            k++;
 
-        scanf("%d", &choice);
-
-        switch(choice)
+        if(k == m)
         {
-            case 1:
-
-                if(mutex == 1 && empty != 0)
-                {
-                    producer();
-                }
-                else
-                {
-                    printf("Buffer Full\n");
-                }
-
-                break;
-
-            case 2:
-
-                if(mutex == 1 && full != 0)
-                {
-                    consumer();
-                }
-                else
-                {
-                    printf("Buffer Empty\n");
-                }
-
-                break;
-
-            case 3:
-
-                exit(0);
-
-            default:
-
-                printf("Invalid Choice\n");
+            printf("Pattern found at position %d\n", i - m + 2);
+            flag = 1;
+            break;
+        }
+        else
+        {
+            i = i + table[t[i]];
         }
     }
+
+    if(!flag)
+        printf("Pattern not found");
 
     return 0;
 }
