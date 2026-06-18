@@ -1,149 +1,82 @@
-const { MongoClient, ObjectId } = require('mongodb');
-
-// MongoDB URL
-const url = 'mongodb://localhost:27017';
-
-// Database Name
-const dbName = 'College';
-
-// Create client
-const client = new MongoClient(url);
+import mongoose from 'mongoose'
+import { MongoClient } from 'mongodb';
 
 
-// Connect to MongoDB
-async function connectDB() {
+const client = new MongoClient('mongodb://localhost:27017/college');
+const dbname = 'college';
 
-  try {
 
-    await client.connect();
+const student = {
+    name: "Ayush",
+    age: 21,
+    course: "CSE"
+};
 
-    console.log("Connected to database");
-
-  } catch (error) {
-
-    console.log("Connection Error");
-
-  }
+const connectDB = async() => {
+    try {
+        const db = await client.connect();
+        console.log("Connected");
+    } catch (error) {
+        console.log("Error");
+    }
 }
 
+connectDB();
 
-// INSERT OPERATION
-async function insertStudent(student) {
-
-  const db = client.db(dbName);
-
-  try {
-
-    const result =
-      await db.collection('student')
-      .insertOne(student);
-
-    console.log("Student inserted");
-
-  } catch (err) {
-
-    console.log("Insert Error");
-
-  }
+const insert = async() => {
+    const db = await client.db(dbname)
+    try {
+        const result = await db.collection('student').insertOne(student);
+        console.log("Student inserted");
+    } catch (error) {
+        console.log("Error in insert")
+    }
 }
 
-
-// FIND OPERATION
-async function findAllStudents() {
-
-  const db = client.db(dbName);
-
-  try {
-
-    const students =
-      await db.collection('student')
-      .find({})
-      .toArray();
-
-    console.log(students);
-
-  } catch (err) {
-
-    console.log("Find Error");
-
-  }
+const update = async() => {
+    const db = await client.db(dbname)
+    try {
+        const result = await db.collection('student').findOneAndUpdate({
+            name: "Ayush"},
+            {$set : {
+                age : 22
+            }},
+            {returnDocument : "after"}
+        );
+        console.log("Student updated");
+    } catch (error) {
+        console.log("Error in update")
+    }
 }
 
-
-// UPDATE OPERATION
-async function updateStudent() {
-
-  const db = client.db(dbName);
-
-  try {
-
-    await db.collection('student').updateOne(
-
-      { _id: new ObjectId('YOUR_ID') },
-
-      {
-        $set: { Dept: "CSE" }
-      }
-
-    );
-
-    console.log("Student Updated");
-
-  } catch (err) {
-
-    console.log("Update Error");
-
-  }
+const get = async() => {
+    const db = await client.db(dbname)
+    try {
+        const result = await db.collection('student').findOne({
+            name : "Ayush"
+        });
+        console.log("get Student");
+        console.log(result)
+    } catch (error) {
+        console.log("Error in get")
+    }
 }
 
-
-// DELETE OPERATION
-async function deleteStudent(id) {
-
-  const db = client.db(dbName);
-
-  try {
-
-    await db.collection('student').deleteOne({
-
-      _id: new ObjectId(id)
-
-    });
-
-    console.log("Student Deleted");
-
-  } catch (err) {
-
-    console.log("Delete Error");
-
-  }
+const deleteS = async(name) => {
+    const db = await client.db(dbname)
+    try {
+        const result = await db.collection('student').findOneAndDelete({
+            name : "Ayush"
+        });
+        console.log("Student deleted");
+    } catch (error) {
+        console.log("Error in delete")
+    }
 }
 
+// insert();
+// update();
+// get();
+deleteS();
 
-// Main Function
-connectDB().then(async () => {
 
-  // Student Data
-  const student = {
-    name: "Monisha",
-    age: 18,
-    cgpa: 6.38,
-    Dept: "CSE"
-  };
-
-  // Insert
-  await insertStudent(student);
-
-  // Display
-  await findAllStudents();
-
-  // Update
-  await updateStudent();
-
-  // Delete
-  await deleteStudent("YOUR_ID");
-
-  // Close connection
-  client.close();
-
-});
